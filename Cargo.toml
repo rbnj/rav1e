@@ -116,6 +116,7 @@ tracing-subscriber = { version = "0.3.18", optional = true }
 tracing-chrome = { version = "0.7.1", optional = true }
 tracing = { version = "0.1.40", optional = true }
 aligned-vec = "0.5.0"
+hdr10plus = { version = "2.0.0", features = ["json"] }
 
 [dependencies.image]
 version = "0.24.8"
