@@ -8,6 +8,7 @@
 // PATENTS file, you can obtain it at www.aomedia.org/license/patent.
 #![deny(missing_docs)]
 
+use crate::encoder::FrameInvariants;
 use crate::frame::*;
 use crate::serialize::{Deserialize, Serialize};
 use crate::stats::EncoderStats;
@@ -143,6 +144,12 @@ pub const ST2094_40_PREFIX: &[u8] = &[
   0x00, 0x01, // ST-2094-40
   0x04, // application_identifier = 4
   0x01, // application_mode = 1
+];
+
+/// Dolby Vision T.35 metadata payload expected prefix.
+pub const T35_DOVI_PAYLOAD_PREFIX: &[u8] = &[
+  0x00, 0x03B, // Dolby
+  0x00, 0x00, 0x08, 0x00, 0x37, 0xCD, 0x08,
 ];
 
 /// A single T.35 metadata packet.
@@ -314,5 +321,19 @@ impl T35 {
   /// According to the [AV1 HDR10+ specification](https://aomediacodec.github.io/av1-hdr10plus).
   pub fn is_hdr10plus_metadata(&self) -> bool {
     self.country_code == 0xB5 && self.data.starts_with(ST2094_40_PREFIX)
+  }
+  
+  /// Whether the T.35 metadata is Dolby Vision Metadata.
+  pub fn is_dovi_metadata(&self) -> bool {
+    self.country_code == 0xB5 && self.data.starts_with(T35_DOVI_PAYLOAD_PREFIX)
+  }
+
+  /// Returns true if the T35 metadata can be added to the frame
+  pub fn is_valid_placement<T: Pixel>(&self, fi: &FrameInvariants<T>) -> bool {
+    if self.is_dovi_metadata() {
+      return fi.show_frame || fi.is_show_existing_frame();
+    }
+
+    true
   }
 }

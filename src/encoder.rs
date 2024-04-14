@@ -3716,7 +3716,9 @@ pub fn encode_show_existing_frame<T: Pixel>(
   }
 
   for t35 in fi.t35_metadata.iter() {
-    write_t35_metadata_packet(&mut packet, t35);
+    if t35.is_valid_placement(fi) {
+      write_t35_metadata_packet(&mut packet, t35);
+    }
   }
 
   // HDR10+ Metadata OBU from config
@@ -3800,7 +3802,9 @@ pub fn encode_frame<T: Pixel>(
   }
 
   for t35 in fi.t35_metadata.iter() {
-    write_t35_metadata_packet(&mut packet, t35);
+    if t35.is_valid_placement(fi) {
+      write_t35_metadata_packet(&mut packet, t35);
+    }
   }
 
   // HDR10+ Metadata OBU from config
